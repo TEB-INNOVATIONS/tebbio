@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEB Innovations - Bio</title>
+    <link rel="icon" href="tab.png" type="image/logo">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Initial full-screen loader (shows while page assets load) -->
+    <div id="initial-loader" class="initial-loader">
+        <div class="spinner" aria-hidden="true"></div>
+    </div>
+
+    <!-- Door overlay used for link transitions (hidden until a link is clicked) -->
+    <div id="door-overlay" class="door-overlay" aria-hidden="true">
+        <div class="door door-left"></div>
+        <div class="door door-right"></div>
+    </div>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="tab.png" alt="TEB Innovations Logo">
+            </div>
+            <h1>TEB Innovations</h1>
+            <p class="subtitle">Explore Our Digital Ecosystem</p>
+        </div>
+
+        <div class="links-container">
+            <a href="https://tebinnovations.in" class="link-card" target="_blank" rel="noopener noreferrer">
+                <div class="link-content">
+                    <div class="link-title">TEB Innovations</div>
+                    <div class="link-description">Creative agency specializing in Web Development, App Development, and Graphic Designing.</div>
+                </div>
+                <div class="link-icon">
+                    <img src="tab.png" alt="TEB">
+                </div>
+            </a>
+
+            <a href="https://awards.tebinnovations.in" class="link-card" target="_blank" rel="noopener noreferrer">
+                <div class="link-content">
+                    <div class="link-title">Our Awards</div>
+                    <div class="link-description">Awards Website</div>
+                </div>
+                <div class="link-icon">
+                    <img src="awards.png" alt="Awards">
+                </div>
+            </a>
+
+            <a href="https://edubot.tebinnovations.in" class="link-card" target="_blank" rel="noopener noreferrer">
+                <div class="link-content">
+                    <div class="link-title">EduBot</div>
+                    <div class="link-description">AI-Powered Education Platform</div>
+                </div>
+                <div class="link-icon">
+                    <img src="eb.png" alt="EduBot">
+                </div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 TEB Innovations. All rights reserved.</p>
+        </div>
+    </div>
+    
+        <script>
+        (function(){
+            const initial = document.getElementById('initial-loader');
+            const door = document.getElementById('door-overlay');
+            const left = door && door.querySelector('.door-left');
+            const right = door && door.querySelector('.door-right');
+
+            // Hide initial loader after full load
+            window.addEventListener('load', function(){
+                // small delay so spinner is visible briefly on fast loads
+                setTimeout(()=>{
+                    if (!initial) return;
+                    initial.classList.add('hidden');
+                    // remove from document flow after transition
+                    setTimeout(()=>{ try{ initial.style.display = 'none'; }catch(e){} }, 500);
+                }, 250);
+            });
+
+            // Intercept clicks on links to run door animation before navigating
+            function handleLinkClick(e){
+                // Only handle primary (left) clicks without modifier keys — let users open in new tabs/windows
+                if (e.button && e.button !== 0) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+                const a = e.currentTarget;
+                const href = a.getAttribute('href');
+                const target = a.getAttribute('target');
+
+                // don't intercept anchors, mailto:, tel:, javascript: links or empty href
+                if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+
+                e.preventDefault();
+
+                // For target "_blank" open a placeholder window immediately to avoid popup blockers
+                let newWin = null;
+                if (target === '_blank') {
+                    try { newWin = window.open('about:blank', '_blank'); } catch(err) { newWin = null; }
+                }
+
+                // If overlay/door isn't available, navigate immediately (use opened window if any)
+                if (!door) {
+                    if (newWin) {
+                        try { newWin.location = href; } catch(e) { window.open(href, '_blank'); }
+                    } else {
+                        if (target === '_blank') window.open(href, '_blank'); else window.location.href = href;
+                    }
+                    return;
+                }
+
+                // First make overlay visible
+                door.classList.add('visible');
+                
+                // Small delay to ensure overlay is visible before animation
+                setTimeout(() => {
+                    // Then start the door opening animation
+                    door.classList.add('open');
+                    
+                    // Wait for animation to fully complete (matches CSS transition-duration)
+                    const animationMs = 700;
+                    setTimeout(() => {
+                        // Finally navigate after doors are fully open
+                        if (newWin) {
+                            try { newWin.location = href; } catch(e) { window.open(href, '_blank'); }
+                        } else {
+                            if (target === '_blank') window.open(href, '_blank'); else window.location.href = href;
+                        }
+                    }, animationMs + 100); // Add extra 100ms buffer after animation
+                }, 50);
+            }
+
+            // Attach to links
+            document.querySelectorAll('a').forEach(a=>{
+                const href = a.getAttribute('href');
+                if (!href) return;
+                a.addEventListener('click', handleLinkClick);
+            });
+        })();
+        </script>
+</body>
+</html>
